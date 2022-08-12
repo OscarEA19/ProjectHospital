@@ -263,18 +263,80 @@ void menu(){
 				
 				//all opcion admin
 				if(checkLogin(ListaUser , fullName , password , 'A')){
-					cout <<"BIENVENID@ ADMINISTRAD@R";
-
-
-
-
-
-
-
-
-
-
-
+					cout <<"BIENVENID@ ADMINISTRAD@R\n";
+					
+					int opcionAdmin;
+					
+					do{
+						system("cls");
+						cout <<"*************MENU PARA ADMINISTRADOR*************\n"<<endl;
+						cout <<"1.CREAR CUENTA PARA USUARIO"<<endl;
+						cout <<"2.ELIMINAR UN USUARIO"<<endl;
+						cout <<"3.ACTIVAR O DESACTIVAR CUENTAS DE USUARIOS"<<endl;
+						cout <<"4.INGRESAR UN DOCTOR"<<endl;
+						cout <<"5.ELIMINAR LA INFORMACION DE UN DOCTOR POR MEDIO DEL CODIGO"<<endl;
+						cout <<"6.MODIFICAR LA INFORMACION DE UN DOCTOR POR MEDIO DEL CODIGO"<<endl;
+						cout <<"7.INGRESAR UN PACIENTE";
+						cout <<"8.ELIMINAR UN PACIENTE";
+						cout <<"9.MODIFICAR LA INFORMACION DE UN PACIENTE POR MEDIO DE LA CEDULA";
+						cout <<"10.VER LISTA DE USUARIOS";
+						cout <<"11.VER LISTA DE DOCTORES";
+						cout <<"12.VER LISTA DE PACIENTES";
+						cout <<"13.SALIR";
+						cin >> opcionAdmin;
+						
+						switch(opcionAdmin){
+							
+							case 1:{
+								
+								break;
+							}
+							case 2:{
+								
+								break;
+							}
+							case 3:{
+								
+								break;
+							}
+							case 4:{
+								
+								break;
+							}
+							case 5:{
+								
+								break;
+							}
+							case 6:{
+								
+								break;
+							}
+							case 7:{
+								
+								break;
+							}
+							case 8:{
+								
+								break;
+							}
+							case 9:{
+								
+								break;
+							}
+							case 10:{
+								
+								break;
+							}
+							case 11:{
+								
+								break;
+							}
+							case 12:{
+								
+								break;
+							}	
+						}
+					}while(opcionAdmin!=13);
 				}else{
 					cout <<"NO SE ENCONTRO EL USUARIO ADMINISTRADOR";
 				}
