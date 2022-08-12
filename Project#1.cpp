@@ -152,6 +152,124 @@ void addUser(listaUser &cab , string fullName, int userCode, char userType, stri
 	}
 }
 
+//Add Doctor
+void addDoctor(listaDoctor &cab ,string fullName, string specialty, int doctorCode){
+	
+	nodoDoctor *newDoctor;
+        	
+    newDoctor = createDoctor(fullName,specialty, doctorCode);
+    if(cab == NULL){
+        cab = newDoctor;
+        cout <<"DOCTOR ALMACENADA CORRECTAMENTE...\n";
+    }else{
+        newDoctor -> next = cab;
+        cab = newDoctor;
+        cout <<"DOCTOR ALMACENADA CORRECTAMENTE...\n";
+    }
+    
+}
+
+//Delete a user
+void deleteUser(listaUser &cab,int userCode){
+	listaUser aux,ant;
+	
+	if(cab == NULL){
+	    cout <<"Lista vacia";
+	}
+	else{
+		aux =cab;
+		if(aux -> userCode == userCode){
+			cab = aux -> next;
+			aux -> next = NULL;
+			delete(aux);
+			aux =cab;
+			cout <<"Usuario Eliminado Correctamente..";
+		}
+		else{
+			ant =aux;
+			while(aux!=NULL){
+				if(aux->userCode == userCode && aux -> next !=NULL){
+					ant->next=aux->next;
+					aux->next=NULL;
+					delete(aux);
+					aux=cab;
+					cout <<"Usuario Eliminado Correctamente..";
+				}
+				else{
+					if(aux->userCode==userCode && aux->next==NULL){
+						ant->next=NULL;
+						delete(aux);
+						aux=cab;
+						cout <<"Usuario Eliminado Correctamente..";
+					}	
+				}
+				ant = aux;
+				aux = aux ->next;
+			}
+		}
+	}
+}
+
+//Delete a Doctor
+void deleteDoctor(listaDoctor &cab,int doctorCode){
+	listaDoctor aux,ant;
+	
+	if(cab == NULL){
+	    cout <<"Lista vacia";
+	}
+	else{
+		aux =cab;
+		if(aux -> doctorCode == doctorCode){
+			cab = aux -> next;
+			aux -> next = NULL;
+			delete(aux);
+			aux =cab;
+			cout <<"Doctor Eliminado Correctamente..";
+		}
+		else{
+			ant =aux;
+			while(aux!=NULL){
+				if(aux->doctorCode == doctorCode && aux -> next !=NULL){
+					ant->next=aux->next;
+					aux->next=NULL;
+					delete(aux);
+					aux=cab;
+					cout <<"Doctor Eliminado Correctamente..";
+				}
+				else{
+					if(aux->doctorCode==doctorCode && aux->next==NULL){
+						ant->next=NULL;
+						delete(aux);
+						aux=cab;
+						cout <<"Doctor Eliminado Correctamente..";
+					}	
+				}
+				ant = aux;
+				aux = aux ->next;
+			}
+		}
+	}
+}
+
+//Modify accountStatus User
+void modifyStatusUser(listaUser &cab,int userCode){
+	listaUser aux= NULL;
+	
+	if(cab == NULL){
+	    cout <<"Lista vacia";
+	}
+	else{
+		aux=cab;
+		while(aux!=NULL){
+			if(aux->userCode==userCode){
+    			aux->accountStatus=false;    
+    			cout <<"Usuario modificado Correctamente";
+ 			}	
+			aux=aux->next;
+		}
+	}
+}
+
 // Show User
 void showUser(listaUser cab){
 	
@@ -169,7 +287,28 @@ void showUser(listaUser cab){
 			cout << "Tipo: " << aux -> userType <<endl;
 			cout << "Cuenta: " << aux -> userAccount <<endl;
 			cout << "Estado: " << aux -> accountStatus <<endl;
+			cout << "Password: " << "*********" <<endl;
 			cout << "----------------------------\n" <<endl;
+			aux=aux->next ;
+		}
+	}	
+}
+
+// Show Doctor
+void showDoctor(listaDoctor cab){
+	
+	listaDoctor aux;
+	
+	if(cab == NULL)
+	cout <<"Lista vacia" << endl;
+	else
+	{
+		aux=cab;
+		while(aux!=NULL)
+		{
+			cout << "Nombre: " << aux -> fullName <<endl;
+			cout << "Especialidad: " << aux -> specialty <<endl;
+			cout << "Codigo Doctor: " << aux -> doctorCode <<endl;
 			aux=aux->next ;
 		}
 	}	
@@ -184,7 +323,7 @@ bool checkLogin(listaUser cab, string fullName, string password , char userType)
 	}else{
 		aux = cab;
 		while(aux != NULL){
-			if(aux -> fullName == fullName && aux -> password == password && aux -> userType == userType){
+			if(aux -> fullName == fullName && aux -> password == password && aux -> userType == userType && aux -> accountStatus == true){
 				return true;
 			}
 			aux = aux -> next;
@@ -197,6 +336,8 @@ bool checkLogin(listaUser cab, string fullName, string password , char userType)
 void menu(){
 	
 	listaUser ListaUser = NULL;
+	addUser(ListaUser ,"Oscar", 1, 'A', "oscarrrr", "Oscar12%");
+
 	listaDoctor ListaDoctor = NULL;
     listaPatient ListaPatient = NULL;
     listaRecord ListaRecord = NULL;
@@ -209,51 +350,23 @@ void menu(){
 	char userType;
 	string userAccount;
 	string password;
+	//Data Doctor
+	string specialty;
+	int doctorCode;
+	
 	
 	do{
 		system("cls");
 		cout <<"*************MENU PARA USUARIOS*************\n"<<endl;
-		cout <<"1.CREAR CUENTA PARA USUARIO(ADMINISTRADOR)"<<endl;
-		cout <<"2.CREAR CUENTA PARA USUARIO(ESTANDAR)"<<endl;
-		cout <<"3.LOGIN COMO ADMINISTRADOR"<<endl;
-		cout <<"4.LOGIN COMO ESTANDAR"<<endl;
-		cout <<"5.VER BASE DE DATOS DE USUARIOS"<<endl;
-		cout <<"6.SALIR\n"<<endl;
+		cout <<"1.LOGIN COMO ADMINISTRADOR"<<endl;
+		cout <<"2.LOGIN COMO ESTANDAR"<<endl;
+		cout <<"3.VER BASE DE DATOS DE USUARIOS"<<endl;
+		cout <<"4.SALIR\n"<<endl;
 		cout <<"INGRESE LA OPCION QUE DESEA: ";
 		cin >> opcionUser;
 		
 		switch (opcionUser){
 			case 1: {
-				system("cls");
-				cout <<"DIGITE EL NOMBRE COMPLETO: ";
-				cin >> fullName;
-				cout <<"DIGITE EL CODIGO DEL USUARIO: ";
-				cin >> userCode;
-				userType = 'A';
-				cout <<"DIGITE LA CUENTA DEL USUARIO CON UN SIZE DE 8 CARACTERES: ";
-				cin >> userAccount;
-				cout <<"DIGITE LA PASSWORD: ";
-				cin >> password;
-				addUser(ListaUser ,fullName, userCode, userType, userAccount, password);
-				system("Pause");
-				break;
-			}
-			case 2: {
-				system("cls");
-				cout <<"DIGITE EL NOMBRE COMPLETO: ";
-				cin >> fullName;
-				cout <<"DIGITE EL CODIGO DEL USUARIO: ";
-				cin >> userCode;
-				userType = 'E';
-				cout <<"DIGITE LA CUENTA DEL USUARIO CON UN SIZE DE 8 CARACTERES: ";
-				cin >> userAccount;
-				cout <<"DIGITE LA PASSWORD: ";
-				cin >> password;
-				addUser(ListaUser , fullName, userCode, userType, userAccount, password);
-				system("Pause");
-				break;
-			}
-			case 3: {
 				system("cls");
 				cout <<"*********************LOGIN*********************\n";
 				cout <<"DIGITE EL NOMBRE COMPLETO: ";
@@ -270,45 +383,88 @@ void menu(){
 					do{
 						system("cls");
 						cout <<"*************MENU PARA ADMINISTRADOR*************\n"<<endl;
-						cout <<"1.CREAR CUENTA PARA USUARIO"<<endl;
-						cout <<"2.ELIMINAR UN USUARIO"<<endl;
-						cout <<"3.ACTIVAR O DESACTIVAR CUENTAS DE USUARIOS"<<endl;
-						cout <<"4.INGRESAR UN DOCTOR"<<endl;
-						cout <<"5.ELIMINAR LA INFORMACION DE UN DOCTOR POR MEDIO DEL CODIGO"<<endl;
-						cout <<"6.MODIFICAR LA INFORMACION DE UN DOCTOR POR MEDIO DEL CODIGO"<<endl;
-						cout <<"7.INGRESAR UN PACIENTE";
-						cout <<"8.ELIMINAR UN PACIENTE";
-						cout <<"9.MODIFICAR LA INFORMACION DE UN PACIENTE POR MEDIO DE LA CEDULA";
-						cout <<"10.VER LISTA DE USUARIOS";
-						cout <<"11.VER LISTA DE DOCTORES";
-						cout <<"12.VER LISTA DE PACIENTES";
-						cout <<"13.SALIR";
+						cout <<"1.CREAR CUENTA PARA USUARIO(ADMINISTRADOR)"<<endl;
+						cout <<"2.CREAR CUENTA PARA USUARIO(ESTANDAR)"<<endl;
+						cout <<"3.ELIMINAR UN USUARIO"<<endl;
+						cout <<"4.ACTIVAR O DESACTIVAR CUENTAS DE USUARIOS"<<endl;
+						cout <<"5.INGRESAR UN DOCTOR"<<endl;
+						cout <<"6.ELIMINAR LA INFORMACION DE UN DOCTOR POR MEDIO DEL CODIGO"<<endl;
+						cout <<"7.MODIFICAR LA INFORMACION DE UN DOCTOR POR MEDIO DEL CODIGO"<<endl;
+						cout <<"8.INGRESAR UN PACIENTE"<<endl;
+						cout <<"9.ELIMINAR UN PACIENTE"<<endl;
+						cout <<"10.MODIFICAR LA INFORMACION DE UN PACIENTE POR MEDIO DE LA CEDULA"<<endl;
+						cout <<"11.VER LISTA DE USUARIOS"<<endl;
+						cout <<"12.VER LISTA DE DOCTORES"<<endl;
+						cout <<"13.VER LISTA DE PACIENTES"<<endl;
+						cout <<"14.SALIR\n";
 						cin >> opcionAdmin;
 						
 						switch(opcionAdmin){
 							
 							case 1:{
-								
+								system("cls");
+								cout <<"DIGITE EL NOMBRE COMPLETO: ";
+								cin >> fullName;
+								cout <<"DIGITE EL CODIGO DEL USUARIO: ";
+								cin >> userCode;
+								userType = 'A';
+								cout <<"DIGITE LA CUENTA DEL USUARIO CON UN SIZE DE 8 CARACTERES: ";
+								cin >> userAccount;
+								cout <<"DIGITE LA PASSWORD: ";
+								cin >> password;
+								addUser(ListaUser ,fullName, userCode, userType, userAccount, password);
+								system("Pause");
 								break;
 							}
 							case 2:{
-								
+								system("cls");
+								cout <<"DIGITE EL NOMBRE COMPLETO: ";
+								cin >> fullName;
+								cout <<"DIGITE EL CODIGO DEL USUARIO: ";
+								cin >> userCode;
+								userType = 'E';
+								cout <<"DIGITE LA CUENTA DEL USUARIO CON UN SIZE DE 8 CARACTERES: ";
+								cin >> userAccount;
+								cout <<"DIGITE LA PASSWORD: ";
+								cin >> password;
+								addUser(ListaUser ,fullName, userCode, userType, userAccount, password);
+								system("Pause");
 								break;
 							}
 							case 3:{
-								
+								system("cls");
+								cout <<"DIGITE EL CODIGO DE USUARIO QUE DESEA ELIMINAR: ";
+								cin >> userCode;
+								deleteUser(ListaUser, userCode);					
+								system("Pause");
 								break;
 							}
 							case 4:{
-								
+								system("cls");
+								cout <<"DIGITE EL CODIGO DE USUARIO AL QUE DESEA CAMBIARLE EL ESTADO: ";
+								cin >> userCode;
+								modifyStatusUser(ListaUser, userCode);					
+								system("Pause");
 								break;
 							}
 							case 5:{
-								
+								system("cls");
+								cout <<"DIGITE EL NOMBRE COMPLETO DEL DOCTOR: ";
+								cin >> fullName;
+								cout <<"DIGITE LA ESPECIALIDAD DEL DOCTOR: ";
+								cin >> specialty;
+								cout <<"DIGITE EL CODIGO DEL DOCTOR";
+								cin >> doctorCode;
+								addDoctor(ListaDoctor, fullName, specialty, doctorCode);
+								system("Pause");
 								break;
 							}
 							case 6:{
-								
+								system("cls");
+								cout <<"DIGITE EL CODIGO DEL DOCTOR QUE DESEA ELIMINAR: ";
+								cin >> doctorCode;
+								deleteDoctor(ListaDoctor,doctorCode);			
+								system("Pause");
 								break;
 							}
 							case 7:{
@@ -332,18 +488,24 @@ void menu(){
 								break;
 							}
 							case 12:{
+								system("cls");
+								showDoctor(ListaDoctor);
+								system("Pause");
+								break;
+							}
+							case 13:{
 								
 								break;
 							}	
 						}
-					}while(opcionAdmin!=13);
+					}while(opcionAdmin!=14);
 				}else{
 					cout <<"NO SE ENCONTRO EL USUARIO ADMINISTRADOR";
 				}
 				system("Pause");
 				break;
 			}
-			case 4: {
+			case 2: {
 				system("cls");
 				cout <<"*********************LOGIN*********************\n";
 				cout <<"DIGITE EL NOMBRE COMPLETO: ";
@@ -374,14 +536,14 @@ void menu(){
 				system("Pause");
 				break;
 			}
-			case 5: {
+			case 3: {
 				system("cls");
 				showUser(ListaUser);
 				system("Pause");
 				break;
 			}
 		}
-	}while(opcionUser != 6);
+	}while(opcionUser != 4);
 }
 
 int main(){
