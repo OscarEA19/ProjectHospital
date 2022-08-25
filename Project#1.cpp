@@ -47,6 +47,8 @@ struct nodoDate{
     string dni;//the id numbero of a patient
     string day;//day for the date
     string hour;//hour for the date
+    bool atendido;
+    string specialty;
     nodoDate *next; 
 };
 
@@ -105,15 +107,33 @@ nodoRecord *createRecord(string fullName, string attentionDate, int doctorCode, 
 } 
  
 //Create a date
-nodoDate *createDate(int doctorCode, string day, string hour,string dni){
+nodoDate *createDate(int doctorCode, string day, string hour,string dni,bool atendido, string specialty){
     nodoDate *aux =  new (struct nodoDate);
     aux -> doctorCode = doctorCode;
     aux -> day = day;
     aux -> hour = hour;
     aux -> dni = dni;
+    aux->atendido = atendido;
+    aux->specialty = specialty;
     aux -> next = NULL;
     return aux;
 } 
+
+//add record 
+void addrecord(listaRecord &cab, string fullName, string attentionDate, int doctorCode, string symptoms, string medicines,string exam){
+	
+	nodoRecord *newRecord; 
+	
+	newRecord = createRecord(fullName,attentionDate,doctorCode,symptoms, medicines, exam);
+	if(cab == NULL ){
+		cab = newRecord; 
+		cout<< "EXPEDIENTE ALMACENADO CORRECTAMENTE";
+	}else{
+		newRecord -> next = cab;
+		cab= newRecord;
+		cout<< "EXPEDIENTE ALMACENADO CORRECTAMENTE";
+	}	
+}
 
 bool checkPassword(string password){
     int n = password.length();
@@ -549,6 +569,29 @@ void showRecord(listaRecord cab){
 		}
 	}
 }
+//show Date
+void showDate(listaDate cab){
+	
+	listaDate aux;
+	
+	if(cab == NULL)
+	cout <<"Lista vacia" << endl;
+	else
+	{
+		aux=cab;
+		while(aux!=NULL)
+		{
+			cout << "Codigo del doctor: " << aux -> doctorCode <<endl;
+			cout << "Dia de la cita: " << aux -> day <<endl;
+			cout << "Hora de la cita: " << aux -> hour <<endl;
+			cout << "Cedula del paciente: " << aux -> dni <<endl;
+			cout << "Atendido: " << aux -> atendido <<endl;
+			cout << "Especialidad del doctor: " << aux->specialty <<endl;
+			cout << "----------------------------------"<<endl;
+			aux=aux->next ;
+		}
+	}
+}
 
 
 //Check that person exists in data base
@@ -570,11 +613,11 @@ bool checkLogin(listaUser cab, string fullName, string password , char userType)
 }
 
 //add date 
-void addDate(listaDate &cab, int doctorCode, string day, string hour,string dni){
+void addDate(listaDate &cab, int doctorCode, string day, string hour,string dni,string specialty){
 	
 	nodoDate *newDate; 
 	
-	newDate = createDate( doctorCode, day, hour,dni);
+	newDate = createDate( doctorCode, day, hour,dni,false,specialty);
 	if(cab == NULL ){
 		cab = newDate; 
 		cout<< "CITA ALMACENADA CORRECTAMENTE";
@@ -622,7 +665,7 @@ void deleteDate(listaDate &cab,string dni,int doctorCode){
 			aux -> next = NULL;
 			delete(aux);
 			aux =cab;
-			cout <<"CITA ELIMINADA CORRECTAMENTE..";
+			cout <<"CITA ALTERADA CORRECTAMENTE..";
 		}
 		else{
 			ant =aux;
@@ -632,14 +675,14 @@ void deleteDate(listaDate &cab,string dni,int doctorCode){
 					aux->next=NULL;
 					delete(aux);
 					aux=cab;
-					cout <<"CITA ELIMINADA CORRECTAMENTE..";
+					cout <<"CITA ALTERADA CORRECTAMENTE..";
 				}
 				else{
 					if(aux -> dni == dni && aux->doctorCode==doctorCode && aux->next==NULL){
 						ant->next=NULL;
 						delete(aux);
 						aux=cab;
-						cout <<"CITA ELIMINADA CORRECTAMENTE..";
+						cout <<"CITA ALTERADA CORRECTAMENTE..";
 					}	
 				}
 				ant = aux;
@@ -652,6 +695,8 @@ void deleteDate(listaDate &cab,string dni,int doctorCode){
 void methodCreateADate(listaDoctor cabDoctor,listaPatient cabPatient,listaDate &cab, string dni,string day,string hour){
 	string symptoms;
 	int doctorCode;
+	string specialty;
+	bool asignar = true;
 	
 	listaPatient auxPatient;
 	listaDoctor auxDoctor;
@@ -682,32 +727,46 @@ void methodCreateADate(listaDoctor cabDoctor,listaPatient cabPatient,listaDate &
 			if(auxDoctor ->specialty == "Cardiologo" && symptoms == "Taquicardia"){
 				doctorCode = auxDoctor ->doctorCode;
 				cout <<"DOCTOR CON ESPECIALIDAD: "<<auxDoctor ->specialty<< endl;
+				specialty = auxDoctor->specialty;
 			}
 			else if(auxDoctor ->specialty == "Odontologo" && symptoms == "Caries"){
 				doctorCode = auxDoctor ->doctorCode;
 				cout <<"DOCTOR CON ESPECIALIDAD:"<<auxDoctor ->specialty<< endl;
+				specialty = auxDoctor->specialty;
 			}else if(auxDoctor ->specialty == "Dermatologia" && symptoms == "Acne"){
 				doctorCode = auxDoctor ->doctorCode;
 				cout <<"DOCTOR CON ESPECIALIDAD:"<<auxDoctor ->specialty<< endl;
+				specialty = auxDoctor->specialty;
 			}else if(auxDoctor ->specialty == "Neumologia" && symptoms == "Asma"){
 				doctorCode = auxDoctor ->doctorCode;
 				cout <<"DOCTOR CON ESPECIALIDAD:"<<auxDoctor ->specialty<< endl;
+				specialty = auxDoctor->specialty;
 			}else if(auxDoctor ->specialty == "Neurologia" && symptoms == "Mareos"){
 				doctorCode = auxDoctor ->doctorCode;
 				cout <<"DOCTOR CON ESPECIALIDAD:"<<auxDoctor ->specialty<< endl;
-			}else{
-				cout <<"NO SE ENCONTRO UN DOLOR PARA ASIGNAR"<< endl;	
+				specialty = auxDoctor->specialty;
+			}
+			else{
+				if(specialty == " "){
+				cout <<"NO SE ENCONTRO UN DOCTOR PARA ASIGNAR"<< endl;
+				asignar= false;	
+				}
 			}
 			auxDoctor=auxDoctor->next ;
 		}
 	}
 	
-	//Check list Date for get a doctor available
-	if(CheckDoctorAvailable(cab,doctorCode,hour, day)){
-		addDate(cab, doctorCode, day, hour,dni);
+	if(asignar){
+			//Check list Date for get a doctor available
+		if(CheckDoctorAvailable(cab,doctorCode,hour, day)){
+			addDate(cab, doctorCode, day, hour,dni,specialty);
+		}else{
+			cout <<"INTENTALO DE NUEVO" << endl;
+		}
 	}else{
-		cout <<"INTENTALO DE NUEVO" << endl;
+		cout <<"NO EXISTE DOCTORES DISPONIBLES" << endl;
 	}
+	
 }
 
 //Change data date
@@ -752,15 +811,54 @@ void modifyDataDate(listaDate &cab,int doctorCode,string day,string hour,string 
 		}
 	}
 }
+void modifyDateAtendido(listaDate &cab, string dni,int doctorCode){
+	listaDate aux;
+	
+	if(cab == NULL)
+	cout <<"Lista vacia" << endl;
+	else
+	{
+		aux=cab;
+		while(aux!=NULL)
+		{
+			if(aux->doctorCode==doctorCode && aux->dni ==dni){
+				aux->atendido=true;
+			}
+			aux=aux->next ;
+		}
+	}
+}
 
 //add a patient in a Record
-void addPatientInRecord(listaPatient cabPatient,listaRecord &cab,listaDate &cabDate,string dni,string attentionDate,int doctorCode,string exam){
+void addPatientInRecord(listaDoctor cabDoctor,listaPatient cabPatient,listaRecord &cab,listaDate &cabDate,string dni,int doctorCode,string exam,string medicines){
 	
 	listaPatient auxPatient;
+	listaDoctor auxDoctor;
 	
 	string fullName;
 	string symptoms;
 	string attentionDate;
+	
+	bool existDoctor = false;
+	
+	//Check list doctor for exit doctor
+	if(cabDoctor == NULL)
+	cout <<"Lista doctores vacias" << endl;
+	else
+	{
+		auxDoctor=cabDoctor;
+		while(auxDoctor!=NULL)
+		{
+			if(auxDoctor->doctorCode == doctorCode){
+				existDoctor = true;
+			}
+			auxDoctor=auxDoctor->next;
+		}
+	}
+	
+	if(!existDoctor){
+		cout <<"No existe el doctor con este codigo: "<<doctorCode<< endl;
+	}
 	
 	//Check list patient for get the symptoms
 	if(cabPatient == NULL)
@@ -777,31 +875,221 @@ void addPatientInRecord(listaPatient cabPatient,listaRecord &cab,listaDate &cabD
 			auxPatient=auxPatient->next;
 		}
 	}
+	//check list date get the  
+	listaDate auxDate;
+		
+	if(cabDate == NULL)
+	cout <<"Lista de citas vacias" << endl;
+	else
+	{
+		auxDate=cabDate;
+		while(auxDate!=NULL)
+		{
+			if(auxDate->dni == dni && auxDate->doctorCode==doctorCode){
+				attentionDate = auxDate->day+"_"+auxDate->hour;
+			}
+			auxDate=auxDate->next ;
+		}
+	}
 	
-	//check list date get the 
+	//add 
+	addrecord(cab,fullName,attentionDate,doctorCode, symptoms, medicines, exam);
 	
+	//Delete date
+	modifyDateAtendido(cabDate, dni,doctorCode);
 	
+}
+
+
+void verificarCountDoctoresWithEspecialidad(listaDoctor cab, string specialty){
 	
+	int count=0;
+	listaDoctor aux;
 	
-	
-	
-	
-	
-	
-	
-	
-	nodoRecord *newRecord; 
-	
-	newRecord = createRecord( fullName, attentionDate,doctorCode, symptoms,phoneNumber,exam);
-	if(cab == NULL ){
-		cab = newPatient; 
-		cout<< "PACIENTE ALMACENADO CORRECTAMENTE";
-	}else{
-		newPatient -> next = cab;
-		cab= newPatient;
-		cout<< "PACIENTE ALMACENADO CORRECTAMENTE";
+	if(cab == NULL)
+	cout <<"Lista vacia" << endl;
+	else
+	{
+		aux=cab;
+		while(aux!=NULL)
+		{
+			if(aux->specialty == specialty){
+				count++;
+			}
+			
+			aux=aux->next ;
+		}
 	}	
+	cout <<"TOTAL DE DOCTORES CON LA ESPECIALIDAD "<<specialty << ": " <<count<< endl;
+}
+
+void verifiDoctor(listaDoctor cab,int doctorCode){
 	
+	listaDoctor aux;
+	
+	if(cab == NULL)
+	cout <<"Lista vacia" << endl;
+	else
+	{
+		aux=cab;
+		while(aux!=NULL)
+		{
+			if(aux->doctorCode==doctorCode){
+				cout << "Nombre: " << aux -> fullName <<endl;
+				cout << "Especialidad: " << aux -> specialty <<endl;
+				cout << "Codigo Doctor: " << aux -> doctorCode <<endl;
+			}			
+			aux=aux->next ;
+		}
+	}
+}
+	
+
+void verifiPatient(listaPatient cab,string dni){
+	
+	listaPatient aux;
+	
+	if(cab == NULL)
+	cout <<"Lista vacia" << endl;
+	else
+	{
+		aux=cab;
+		while(aux!=NULL)
+		{
+			if(aux->dni == dni){
+				cout << "Nombre: " << aux -> fullName <<endl;
+				cout << "Cedula: " << aux -> dni <<endl;
+				cout << "Numero Telefonico: " << aux -> phoneNumber <<endl;
+				cout << "Sintomas: " << aux -> symptoms <<endl;
+				cout << "Fecha de entrada: " << aux -> entryDate <<endl;
+			}
+			aux=aux->next ;
+		}
+	}
+}
+
+void verificarCitasPorFecha(listaDate cab, string day){
+	listaDate aux;
+	
+	if(cab == NULL)
+	cout <<"Lista vacia" << endl;
+	else
+	{
+		aux=cab;
+		while(aux!=NULL)
+		{
+			if(aux->day==day){
+				cout << "Codigo del doctor: " << aux -> doctorCode <<endl;
+				cout << "Dia de la cita: " << aux -> day <<endl;
+				cout << "Hora de la cita: " << aux -> hour <<endl;
+				cout << "Cedula del paciente: " << aux -> dni <<endl;
+				cout << "Atendido: " << aux -> atendido <<endl;
+				cout << "----------------------------------"<<endl;
+			}
+			aux=aux->next ;
+		}
+	}
+}
+
+
+void verificarCantidadPacientesPorEspecialidadAndAtendido(listaDate cab, string specialty){
+	
+	listaDate aux;
+	int count=0;
+	
+	if(cab == NULL)
+	cout <<"Lista vacia" << endl;
+	else
+	{
+		aux=cab;
+		while(aux!=NULL)
+		{
+			if(aux->specialty==specialty && aux->atendido ==true){
+				count++;
+			}
+			aux=aux->next ;
+		}
+	}
+	cout << "Cantidad de pacientes segun la especialidad " << specialty << ": " <<count <<endl;
+}
+
+void verificarCantidadPacienteAtendidoPorDoctor(listaDate cab, int doctorCode){
+	
+	listaDate aux;
+	int count=0;
+	
+	if(cab == NULL)
+	cout <<"Lista vacia" << endl;
+	else
+	{
+		aux=cab;
+		while(aux!=NULL)
+		{
+			if(aux->doctorCode==doctorCode && aux->atendido ==true){
+				count++;
+			}
+			aux=aux->next ;
+		}
+	}
+	cout << "Cantidad de pacientes segun el codigo del doctor " << doctorCode << ", atendidos: " <<count <<endl;
+}
+
+void verificarPacienteDoctorCita( listaDate cab,listaPatient cabPatient, string dni){
+	
+	listaPatient auxPatient;
+	
+	if(cabPatient == NULL)
+	cout <<"Lista vacia" << endl;
+	else
+	{
+		auxPatient=cabPatient;
+		while(auxPatient!=NULL)
+		{
+			if(auxPatient->dni ==dni){
+				cout << "Nombre del paciente: " << auxPatient->fullName <<endl;
+			}
+			auxPatient=auxPatient->next ;
+		}
+	}
+	
+	listaDate aux;
+	
+	if(cab == NULL)
+	cout <<"Lista vacia" << endl;
+	else
+	{
+		aux=cab;
+		while(aux!=NULL)
+		{
+			if(aux->dni==dni){
+				cout << "Codigo del doctor: " << aux -> doctorCode <<endl;
+				cout << "Dia de la cita: " << aux -> day <<endl;
+				cout << "Hora de la cita: " << aux -> hour <<endl;
+				cout << "Cedula del paciente: " << aux -> dni <<endl;
+				cout << "----------------------------------"<<endl;
+			}
+			aux=aux->next ;
+		}
+	}		
+}
+
+void doctoresTotales(listaDoctor cab){
+	
+	listaDoctor aux;
+	int count=0;
+	
+	if(cab == NULL)
+	cout <<"Lista vacia" << endl;
+	else
+	{
+		aux=cab;
+		while(aux!=NULL)
+		{
+			count++;
+			aux=aux->next ;
+		}
+	}
+	cout << "Cantidad de doctores totales: " << count<<endl;
 }
 
 void menu(){
@@ -811,12 +1099,14 @@ void menu(){
 	addUser(ListaUser, "Carlos Austin",3,'E',"Carlosrt","Carlos12%");
 	listaDoctor ListaDoctor = NULL;
 	addDoctor(ListaDoctor,"Monse","Cardiologo");
+	addDoctor(ListaDoctor,"oscar","Neurologia");
     listaPatient ListaPatient = NULL;
-	addPatient(ListaPatient,"Aaron R","123456789","88888888","Fiebre","16/08/2022");
-    
+	addPatient(ListaPatient,"Aaron R","123456789","88888888","Taquicardia","16/08/2022");
+    addPatient(ListaPatient,"samuel","22222222","88888888","Mareos","16/08/2022");
     listaRecord ListaRecord = NULL;
     
     listaDate ListaDate =NULL;
+    addDate(ListaDate,41,"18/08/2022","12","123456789","Cardiologo");
     
     
     	
@@ -839,16 +1129,16 @@ void menu(){
 	//Data Date
 	string day;
 	string hour;
-	
-	
-	
-	
+	//Data Record
+	string medicine;
+	string exam;
 	do{
+		system("color 71");
 		system("cls");
 		cout <<"*************MENU PARA USUARIOS*************\n"<<endl;
 		cout <<"1.LOGIN COMO ADMINISTRADOR"<<endl;
 		cout <<"2.LOGIN COMO ESTANDAR"<<endl;
-		cout <<"3.VER BASE DE DATOS DE USUARIOS"<<endl;
+		cout <<"3.VER LISTA VERIFICAR"<<endl;
 		cout <<"4.SALIR\n"<<endl;
 		cout <<"INGRESE LA OPCION QUE DESEA: ";
 		cin >> opcionUser;
@@ -870,6 +1160,7 @@ void menu(){
 					int opcionAdmin;
 					
 					do{
+						system("color 71");
 						system("cls");
 						cout <<"*************MENU PARA ADMINISTRADOR*************\n"<<endl;
 						cout <<"1.CREAR CUENTA PARA USUARIO(ADMINISTRADOR)"<<endl;
@@ -1014,6 +1305,7 @@ void menu(){
 							}	
 						}
 					}while(opcionAdmin!=14);
+					system("color 71");
 				}else{
 					cout <<"NO SE ENCONTRO EL USUARIO ADMINISTRADOR";
 				}
@@ -1036,6 +1328,7 @@ void menu(){
 				int opcionEstandar;
 					
 					do{
+						system("color 71");
 						system("cls");
 						cout <<"*************MENU PARA USUARIOS ESTANDAR*************\n"<<endl;
 						cout <<"1.INGRESAR UN PACIENTE"<<endl;
@@ -1045,10 +1338,10 @@ void menu(){
 						cout <<"5.MODIFICAR UNA CITA"<<endl;
 						cout <<"6.ELIMINAR UNA CITA"<<endl;
 						cout <<"7.ATENDER PACIENTE"<<endl;
-						cout <<"8.VER EXPEDIENTE DEL PACIENTE"<<endl;
+						cout <<"8.VER EXPEDIENTE DEL LOS PACIENTE"<<endl;
 						cout <<"9.VER LISTA PACIENTES"<<endl;
-						cout <<"9.VER LISTA CITAS"<<endl;
-						cout <<"10.SALIR\n";
+						cout <<"10.VER LISTA CITAS"<<endl;
+						cout <<"11.SALIR\n";
 						cin >> opcionEstandar;
 						
 						switch(opcionEstandar){
@@ -1124,24 +1417,37 @@ void menu(){
 								system("cls");
 								cout <<"DIGITE LA CEDULA DEL PACIENTE QUE DESEA ATENDER: ";
 								cin >> dni;
-								
+								cout <<"DIGITE EL CODIGO DEL DOCTOR QUE LO ATENDIO: ";
+								cin >> doctorCode;
+								cout <<"DIGITE LAS MEDICINAS ENVIADAS AL PACIENTE: ";
+								cin >> medicine;
+								cout <<"DIGITE LOS EXAMENES ENVIADOS AL PACIENTE: ";
+								cin >> exam;
+								addPatientInRecord(ListaDoctor,ListaPatient,ListaRecord,ListaDate,dni,doctorCode,exam,medicine);								
 								system("Pause");
 								break;
 							}
 							case 8:{
 								system("cls");
-								
+								showRecord(ListaRecord);
 								system("Pause");
 								break;
 							}
 							case 9:{
 								system("cls");
-							
+								showPatien(ListaPatient);
+								system("Pause");
+								break;
+							}
+							case 10:{
+								system("cls");
+								showDate(ListaDate);
 								system("Pause");
 								break;
 							}
 						}
-					}while(opcionEstandar!=10);	
+					}while(opcionEstandar!=11);	
+					system("color 71");
 				}else{
 					cout <<"NO SE ENCONTRO EL USUARIO ESTANDAR";
 				}
@@ -1150,12 +1456,95 @@ void menu(){
 			}
 			case 3: {
 				system("cls");
-				showUser(ListaUser);
+				cout <<"*********************OPCIONES VERFICAR*********************\n";		
+				int opcionEstandar;
+					do{
+						system("color 71");
+						system("cls");
+						cout <<"*********************OPCIONES VERFICAR*********************\n";
+						cout <<"1.VERIFICAR LOS DATOS DE UN PACIENTE POR LA CEDULA"<<endl;
+						cout <<"2.VERIFICAR LOS DATOS DE UN DOCTOR POR EL CODIGO DEL DOCTOR"<<endl;
+						cout <<"3.VERIFICAR LAS CITAS ESTABLECIDAS POR EN UNA FECHA"<<endl;
+						cout <<"4.VERIFICAR LA CANTIDAD DE PACIENTE ATENDIDOS SEGUN LA ESPECIALIDAD"<<endl;
+						cout <<"5.VERIFICAR LOS PACIENTES POR EL NOMBRE Y NUMERO DE CEDULA, ASI COMO EL DOCTOR QUE LOS ATIENDE Y LA HORA DE LA CITA POR MEDIO DEL DIA Y MES"<<endl;
+						cout <<"6.VERIFICAR LA CANTIDAD DE DOCTORES DE ACUERDO A LA ESPECIALIDA"<<endl;
+						cout <<"7.VERIFICAR LA CANTIDAD TOTAL DE DOCTORES EN LA CLINICA"<<endl;
+						cout <<"8.VERIFICAR LA CANTIDAD DE PACIENTES ATENDIDOS POR DOCTOR"<<endl;
+						cout <<"9.SALIR\n";
+						cin >> opcionEstandar;
+						
+						switch(opcionEstandar){
+							case 1:{
+								system("cls");
+								cout <<"DIGITE LA CEDULA DEL PACIENTE: ";
+								cin >> dni;
+								verifiPatient(ListaPatient , dni);
+								system("Pause");
+								break;
+							}
+							case 2:{
+								system("cls");
+								cout <<"DIGITE EL CODIGO DEL DOCTOR: ";
+								cin >> doctorCode;
+								verifiDoctor(ListaDoctor,doctorCode);
+								system("Pause");
+								break;
+							}
+							case 3:{
+								system("cls");
+								cout <<"DIGITE LA FECHA: ";
+								cin >> day;
+								verificarCitasPorFecha(ListaDate, day);
+								system("Pause");
+								break;
+							}
+							case 4:{
+								system("cls");
+								cout <<"DIGITE LA ESPECIALIDAD: ";
+								cin >> specialty;
+								verificarCantidadPacientesPorEspecialidadAndAtendido(ListaDate, specialty);
+								system("Pause");
+								break;
+							}
+							case 5:{
+								system("cls");
+								cout <<"DIGITE LA CEDULA DEL PACIENTE: ";
+								cin >> dni;
+								verificarPacienteDoctorCita(ListaDate,ListaPatient,dni);
+								system("Pause");
+								break;
+							}
+							case 6:{
+								system("cls");
+								cout <<"DIGITE LA ESPECIALIDAD: ";
+								cin >> specialty;
+								verificarCountDoctoresWithEspecialidad(ListaDoctor,specialty);
+								system("Pause");
+								break;
+							}
+							case 7:{
+								system("cls");
+								doctoresTotales(ListaDoctor);
+								system("Pause");
+								break;
+							}
+							case 8:{
+								system("cls");
+								cout <<"DIGITE EL CODIGO DEL DOCTOR: ";
+								cin >> doctorCode;
+								verificarCantidadPacienteAtendidoPorDoctor(ListaDate, doctorCode);
+								system("Pause");
+								break;
+							}
+						}
+					}while(opcionEstandar!=9);
+					system("color 71");	
 				system("Pause");
-				break;
+				break;	
 			}
 		}
 	}while(opcionUser != 4);
+	system("color 71");
 }
 
 int main(){
